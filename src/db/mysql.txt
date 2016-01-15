@@ -1,0 +1,57 @@
+create database ladders default character set utf8;
+create table jjc2v2 (
+date varchar(20),
+href varchar(200),
+rank int,
+server varchar(10),
+faction varchar(10),
+name varchar(100),
+race varchar(10),
+class varchar(10),
+telant varchar(50),
+win int,
+loss int,
+rating int
+);
+create table jjc5v5 (
+date varchar(20),
+href varchar(200),
+rank int,
+server varchar(10),
+faction varchar(10),
+name varchar(100),
+race varchar(10),
+class varchar(10),
+telant varchar(50),
+win int,
+loss int,
+rating int
+);
+create table jjc3v3 (
+date varchar(20),
+href varchar(200),
+rank int,
+server varchar(10),
+faction varchar(10),
+name varchar(100),
+race varchar(10),
+class varchar(10),
+telant varchar(50),
+win int,
+loss int,
+rating int
+);
+create table rbg (
+date varchar(20),
+href varchar(200),
+rank int,
+server varchar(10),
+faction varchar(10),
+name varchar(100),
+race varchar(10),
+class varchar(10),
+telant varchar(50),
+win int,
+loss int,
+rating int
+);

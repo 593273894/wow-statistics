@@ -1,0 +1,9 @@
+use ladders;
+db.createCollection('jjc2v2');
+db.createCollection('jjc3v3');
+db.createCollection('jjc5v5');
+db.createCollection('rbg');
+db.jjc2v2.createIndex('date':1);
+db.jjc3v3.createIndex('date':1);
+db.jjc5v5.createIndex('date':1);
+db.rbg.createIndex('date':1);
