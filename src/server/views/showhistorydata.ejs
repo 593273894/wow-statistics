@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>显示数据</title>
+</head>
+
+<body style='background-color:rgb(233,233,233);'>
+	<h1 style='text-align:center;'>显示数据</h1>
+	<div id='data' style="height: 1000px;width:1000px;margin:0 auto;">
+
+	</div>
+</body>
+<script src="/echarts/build/dist/echarts.js"></script>
+<script type="text/javascript" src="/js/ejs.min.js"></script>
+<script type="text/javascript">
+</script>
+<script type="text/javascript">
+
+
+var showLegend=true;
+if(document.body.clientWidth<500){
+	showLegend=false;
+}
+document.getElementById('data').style.width=document.body.clientWidth+'px';
+
+var json = '<%- JSON.stringify(json) %>';
+json = JSON.parse(json);
+for(var i=json.length-1;i>=0;i--){
+	json[i]={
+		'date':json[i]['_id'].date,
+		'class':json[i]['_id']['class'],
+		'count':json[i]['count']
+	}
+}
+var days=[];
+var series={'术士':[],'武僧':[],'萨满':[],'战士':[],'死亡骑士':[],'牧师':[],'圣骑士':[],'猎人':[],'德鲁伊':[],'法师':[],'盗贼':[]};
+retseries=[{name:'',type:'',line:[]}];
+var curDay=json[0].date;
+days.push(curDay);
+for(var i=0,len=json.length;i<len;i++){
+	if(json[i].date!=curDay){
+		curDay=json[i].date;
+		days.push(curDay);
+	}
+	series[json[i]['class']].push(json[i].count);
+}
+retseries.push({name:'术士',type:'line',data:series['术士'],itemStyle:{normal:{color:'rgb(147,130,201)'}}});
+retseries.push({name:'武僧',type:'line',data:series['武僧'],itemStyle:{normal:{color:'rgb(2,255,148)'}}});
+retseries.push({name:'萨满',type:'line',data:series['萨满'],itemStyle:{normal:{color:'rgb(0,114,220)'}}});
+retseries.push({name:'战士',type:'line',data:series['战士'],itemStyle:{normal:{color:'rgb(198,157,111)'}}});
+retseries.push({name:'死亡骑士',type:'line',data:series['死亡骑士'],itemStyle:{normal:{color:'rgb(199,30,59)'}}});
+retseries.push({name:'牧师',type:'line',data:series['牧师'],itemStyle:{normal:{color:'rgb(255,255,255)'}}});
+retseries.push({name:'圣骑士',type:'line',data:series['圣骑士'],itemStyle:{normal:{color:'rgb(249,140,181)'}}});
+retseries.push({name:'猎人',type:'line',data:series['猎人'],itemStyle:{normal:{color:'rgb(172,211,118)'}}});
+retseries.push({name:'德鲁伊',type:'line',data:series['德鲁伊'],itemStyle:{normal:{color:'rgb(255,126,9)'}}});
+retseries.push({name:'法师',type:'line',data:series['法师'],itemStyle:{normal:{color:'rgb(105,203,238)'}}});
+retseries.push({name:'盗贼',type:'line',data:series['盗贼'],itemStyle:{normal:{color:'rgb(255,245,103)'}}});
+
+var item=window.location.href.substring(window.location.href.indexOf('showhistorydata/')+16);
+
+		// 路径配置
+		require.config({
+			paths: {
+				echarts: '/echarts/build/dist'
+			}
+		});
+		// 使用
+		require(
+			[
+			'echarts',
+				'echarts/chart/line'
+				],
+				function(ec) {
+				// 基于准备好的dom，初始化echarts图表
+				var myChart = ec.init(document.getElementById('data'));
+				option = {
+					title : {
+						text: '天梯'+item+'职业人数变化',
+						subtext: '来自战网前500名'
+					},
+					tooltip : {
+						trigger: 'axis'
+					},
+					legend: {
+						show:showLegend,
+						data:['术士','武僧','萨满','战士','死亡骑士','牧师','圣骑士','猎人','德鲁伊','法师','盗贼']
+					},
+					xAxis : [
+					{
+						type : 'category',
+						boundaryGap : false,
+						data : days
+					}
+					],
+					yAxis : [
+					{
+						type : 'value',
+						axisLabel : {
+							formatter: '{value} 人'
+						}
+					}
+					],
+					series : retseries
+				};
+				// 为echarts对象加载数据 
+				myChart.setOption(option);
+			}
+			);
+		</script>
+
+		</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>选择时间</title>	
+	<style type="text/css">
+	body {
+		background-color: #dceffe;
+	    font-size: 12px;
+	    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	    line-height: 22px;
+	}
+	.main{
+		width:80%;
+		margin: 0 auto;
+		text-align: center;
+		background-color: #ffffff;
+	}
+	ul{
+		padding: 0;
+	}
+	li{
+		font-size: 20px;
+		list-style: none;
+	}
+	#page{
+		width: auto;
+		margin:0 auto;
+		overflow: auto;
+	}
+	.pagination-parent{
+		margin-top: 15px;
+		margin-left: 25px;
+		margin-bottom: 25px;
+	}
+	.pagination-item{
+		padding: 5px 9px;
+		color: #666;
+		text-decoration: none;
+		border: 1px solid #e6e6e6;
+	}
+	.pagination-current{
+		color: #3e89fa;
+		border: none;
+	}
+	</style>
+</head>
+<body>
+	<div class='main'>
+		<h1>选择一个时间</h1>
+		<div id='dates'>
+			<ul id='date'>
+			</ul>
+			<div id='page'>
+				<div class="pagination-parent">
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="/js/ejs.min.js"></script>
+<script>
+	var alldates='<%- JSON.stringify(alldates) %>';
+	alldates=JSON.parse(alldates);
+	alldates.sort(function(a,b){if(a>b)return -1;else if(a<b)return 1;else return 0;});
+	var uldate=document.getElementById('date');
+	var pagerParent=document.querySelectorAll('.pagination-parent')[0];
+	var list=makeList(uldate,pagerParent,alldates,5,1);
+	//html+='<li><a class="aday" href="javascript:void(0)">天梯环境变化趋势</a></li>';
+	document.getElementById('dates').addEventListener('click',function(e){
+		if(e.target.className=='aday'){
+			var item=window.location.href.substring(window.location.href.indexOf('choosedate/')+11);
+			var date=e.target.innerText;
+			console.log(date+item);
+			if(date=='天梯环境变化趋势'){
+				window.location.href='/showhistorydata/'+item;
+			}
+			else{
+				window.location.href='/showdaydata/'+item+'/'+date;
+			}
+		}
+	});
+	document.querySelectorAll('.pagination-parent')[0].addEventListener('click',function(e){
+		if(e.target.className=='pagination-item'){
+			switch (e.target.innerText){
+				case '首页':
+					list.toHeadPage();
+					break;
+				case '<上一页':
+					list.lastPage();
+					break;
+				case '下一页>':
+					list.nextPage();
+					break;
+				case '尾页':
+					list.toTailPage();
+					break;
+				default://点击某一页
+					list.jumpTo(e.target.innerText);
+					break;
+			}
+		}
+	});
+
+	function makeList(list,pager,dates,itemPerPage,currentPage){
+		var item=window.location.href.substring(window.location.href.indexOf('choosedate/')+11);
+		var listHTML='';
+		var pagerHTML='';
+		currentPage=currentPage||1;
+		var maxPage=Math.ceil(dates.length/itemPerPage);
+		for(var i=0;i<itemPerPage;i++){//生成列表项
+			listHTML+='<li id="li'+dates[itemPerPage*(currentPage-1)+i]+'"><a class="aday" href="/showdaydata/'+item+'/'+dates[itemPerPage*(currentPage-1)+i]+'">'+dates[itemPerPage*(currentPage-1)+i]+'</a></li>';
+			if(!dates[itemPerPage*(currentPage-1)+i+1]){
+				break;
+			}
+		}
+		if(currentPage!=1){//生成分页中的首页和上一页
+			pagerHTML+='<a class="pagination-item" href="javascript:void(0)">首页</a> ';
+			pagerHTML+='<a class="pagination-item" href="javascript:void(0)">&lt;上一页</a> ';
+		}
+		for(var i=1;i<=maxPage;i++){//生成页码
+			if(currentPage==i){//生成当前页码
+				pagerHTML+='<span class="pagination-current pagination-item">'+i+'</span> ';
+			}
+			else{//生成其他页码
+				pagerHTML+='<a class="pagination-item" href="javascript:void(0)">'+i+'</a> ';
+			}
+		}
+		if(maxPage!=currentPage){
+			pagerHTML+='<a class="pagination-item" href="javascript:void(0)">下一页&gt;</a> ';
+			pagerHTML+='<a class="pagination-item" href="javascript:void(0)">尾页</a>';
+		}
+		list.innerHTML=listHTML;
+		pager.innerHTML=pagerHTML;
+		return {
+			toHeadPage:function(){
+				makeList(list,pager,dates,itemPerPage,1);
+			},
+			lastPage:function(){
+				makeList(list,pager,dates,itemPerPage,--currentPage);
+			},
+			nextPage:function(){
+				makeList(list,pager,dates,itemPerPage,++currentPage);
+			},
+			toTailPage:function(){
+				makeList(list,pager,dates,itemPerPage,maxPage);
+			},
+			jumpTo:function(pageno){
+				makeList(list,pager,dates,itemPerPage,pageno);
+			}
+		};
+	}
+</script>
+</html>

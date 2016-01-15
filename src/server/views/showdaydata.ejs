@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>显示数据</title>
+	<style>
+
+	</style>
+</head>
+
+<body style='background-color:rgb(233,233,233);'>
+	<h1 id="title" style='text-align:center;'>显示数据</h1>
+	<div id='data' style="width:1000px;height:500px;margin:0 auto;position:relative;top:0;bottom:0;">
+	</div>
+</body>
+<script src="/echarts/build/dist/echarts.js"></script>
+<script type="text/javascript" src="/js/ejs.min.js"></script>
+<script type="text/javascript">
+
+
+var json = '<%- JSON.stringify(json) %>';
+json = JSON.parse(json);
+
+var titlemargin=window.getComputedStyle(document.getElementById('title'))['marginTop'];
+titlemargin=titlemargin.substring(0,titlemargin.indexOf('px'))*2;
+var titleheight=window.getComputedStyle(document.getElementById('title'))['height'];
+titleheight=parseInt(titleheight.substring(0,titleheight.indexOf('px')));
+var showLegend=true;
+if(document.body.clientWidth<500){
+	showLegend=false;
+	document.getElementById('data').style.width=document.body.clientWidth+'px';
+	document.getElementById('data').style.height=(window.screen.height-titleheight-titlemargin-100)+'px';
+}
+	document.getElementById('data').style.top=titlemargin+titleheight+'px';
+for(var i=json.length-1;i>=0;i--){
+	json[i]={
+		'class':json[i]['_id']['class'],
+		'count':json[i]['count']
+	}
+}
+console.log(json);  //[{class:'',count:''},{class:'',count:''}]
+var date=json[0]['date'];
+var ser=[];
+var colorList={
+	'术士':'rgb(147,130,201)',
+	'武僧':'rgb(2,255,148)',
+	'萨满':'rgb(0,114,220)',
+	'战士':'rgb(198,157,111)',
+	'死亡骑士':'rgb(199,30,59)',
+	'牧师':'rgb(255,255,255)',
+	'圣骑士':'rgb(249,140,181)',
+	'猎人':'rgb(172,211,118)',
+	'德鲁伊':'rgb(255,126,9)',
+	'法师':'rgb(105,203,238)',
+	'盗贼':'rgb(255,245,103)'
+};
+for(var i=json.length-1;i>=0;i--){
+	ser.push({
+		name:json[i]['class'],
+		value:json[i]['count'],
+		itemStyle:{
+			normal:{
+				color:colorList[json[i]['class']],
+				label:{
+					textStyle:{
+						color:'#000'
+					}
+				},
+				labelLine:{
+					lineStyle:{
+						color:'#000'
+					}
+				}
+			}
+		}
+	});
+}
+
+
+console.log(ser);
+		// 路径配置
+		require.config({
+			paths: {
+				echarts: '/echarts/build/dist'
+			}
+		});
+		// 使用
+		require(
+			[
+			'echarts',
+				'echarts/chart/pie' 
+				],
+				function(ec) {
+				// 基于准备好的dom，初始化echarts图表
+				var myChart = ec.init(document.getElementById('data'));
+				option = {
+					title : {
+						text: '天梯前500名职业分布',
+						subtext: date,
+						x:'center'
+					},
+					tooltip : {
+						trigger: 'item',
+						formatter:"{a}<br>{b} : {c} ({d}%)"
+					},
+					legend: {
+						show:showLegend,
+						orient:'vertical',
+						x:'left',
+						data : ['术士','武僧','萨满','战士','死亡骑士','牧师','圣骑士','猎人','德鲁伊','法师','盗贼']
+					},
+					toolbox: {
+						show : false
+					},
+					calculable : false,
+					series : [
+					{
+						name:'职业人数',
+						type:'pie',
+						radius:'60%',
+						center:['50%','50%'],
+						data:ser
+					}
+					],
+					animation:false,
+					animationDuration:100,
+					animationThreshold:100
+				};
+
+				// 为echarts对象加载数据 
+				myChart.setOption(option);
+				console.log(myChart.getOption());
+
+			}
+			);
+		</script>
+
+		</html>
